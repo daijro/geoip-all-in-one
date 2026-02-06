@@ -15,6 +15,6 @@ vote_priority:
   - ipinfo-country
   - iplocate-country
 
-# source pairs that force a country win before voting (pretty accurate combo)
-overrides:
-  - match: [ip2location, geo-whois-asn-country]
+# source pairs that force a country win before voting
+# overrides:
+#   - match: [ip2location, geo-whois-asn-country]

@@ -274,25 +274,25 @@ def pick_winner(
         lat, lon, src = pick_center_coords(available_ll, threshold)
         return (ll_country_list[0], lat, lon, f'unanimous->{src}')
 
-    # override rules (preconfigured pairs that force a country win)
-    for rule in merge_config.get('overrides', []):
-        match_names = rule['match']
-        match_countries = []
-        all_present = True
-        for src_name in match_names:
-            if src_name not in countries:
-                all_present = False
-                break
-            match_countries.append(countries[src_name])
+    # rules that override the country vote if they match
+    # for rule in merge_config.get('overrides', []):
+    #     match_names = rule['match']
+    #     match_countries = []
+    #     all_present = True
+    #     for src_name in match_names:
+    #         if src_name not in countries:
+    #             all_present = False
+    #             break
+    #         match_countries.append(countries[src_name])
 
-        if not all_present or len(set(match_countries)) != 1:
-            continue
+    #     if not all_present or len(set(match_countries)) != 1:
+    #         continue
 
-        matched_country = match_countries[0]
-        coords = find_coords(matched_country)
-        if coords:
-            lat, lon, src = coords
-            return (matched_country, lat, lon, '+'.join(match_names) + f'->{src}')
+    #     matched_country = match_countries[0]
+    #     coords = find_coords(matched_country)
+    #     if coords:
+    #         lat, lon, src = coords
+    #         return (matched_country, lat, lon, '+'.join(match_names) + f'->{src}')
 
     # vote (rank countries by count, break ties using vote_priority)
     if not coord_sources:
@@ -301,7 +301,7 @@ def pick_winner(
     vote_priority = merge_config.get('vote_priority', [])
     top = votes.most_common()
 
-    # resolve ties: among tied countries, prefer one from vote_priority that has coords
+    # handle ties (among tied countries, prefer one from vote_priority that has coords)
     if len(top) >= 2 and top[0][1] == top[1][1]:
         tied = {c for c, n in top if n == top[0][1]}
         for prio_name in vote_priority:

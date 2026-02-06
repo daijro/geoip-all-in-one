@@ -36,8 +36,6 @@ The winning country is then used to narrow down city sources which then picks a 
 
 If all 3 city sources agree on the same country, the middle-most/most common coordinate pair is used.
 
-(Also, from messing around against other GeoIP lookup sites, IP2Location and GeoFeed seem to have the most accurate results. I've set them to override the vote when they agree.)
-
 ---
 
 This was developed for Camoufox's geolocation finder, so I've left out city names and only included country ISO codes, coordinates, and timezone to keep the file size smaller. I may add more later.

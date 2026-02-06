@@ -2,7 +2,7 @@ name: Build
 
 on:
   schedule:
-    - cron: '0 3 * * 3'  # every wednesday 3am utc
+    - cron: "0 3 * * 3" # every wednesday 3am utc
   workflow_dispatch:
 
 permissions:
@@ -20,7 +20,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Expand swap space
         run: |
@@ -33,8 +33,14 @@ jobs:
       - name: Install dependencies
         run: pip install pyyaml mmdb_writer netaddr tzfpy requests
 
-      - name: Build
-        run: make all ipv4 ipv6
+      - name: Build all
+        run: make all
+
+      - name: Build ipv4
+        run: make ipv4
+
+      - name: Build ipv6
+        run: make ipv6
 
       - name: Prepare release files
         run: |
