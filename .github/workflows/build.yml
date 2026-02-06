@@ -39,6 +39,7 @@ jobs:
       - name: Prepare release files
         run: |
           cp geoip_ipv4.mmdb geoip-aio-ipv4.mmdb
+          7z a -tzip -mx=9 geoip-aio-ipv4.mmdb.zip geoip-aio-ipv4.mmdb
 
       - name: Get release tag
         id: tag
@@ -61,6 +62,7 @@ jobs:
           name: ${{ steps.tag.outputs.tag }}
           files: |
             geoip-aio-ipv4.mmdb
+            geoip-aio-ipv4.mmdb.zip
 
       - name: Remove old releases
         uses: dev-drprasad/delete-older-releases@master
