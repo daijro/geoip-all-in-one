@@ -1,0 +1,56 @@
+merge:
+  # if all 3 coord sources say the same country, try and find the center source
+  # unless they are lower than this long/lat degree threshold
+  coord_spread_threshold: 2
+  coord_priority:
+    - ip2location
+    - dbip
+    - geolite2
+
+  # country voting tiebreak order
+  vote_priority:
+    - ip2location
+    - geo-whois-asn-country
+    - dbip
+    - geolite2
+    - ipinfo-country
+    - iplocate-country
+
+  # source pairs that force a country win before voting (pretty accurate combo)
+  overrides:
+    - match: [ip2location, geo-whois-asn-country]
+
+
+latlong:
+  ip2location:
+    format: hex_tsv
+    lat_col: 5
+    long_col: 6
+    ipv4: "https://gitlab.com/tdulcet/ip-geolocation-dbs/-/raw/main/ip2location-city/ipv4.tsv?inline=false"
+    ipv6: "https://gitlab.com/tdulcet/ip-geolocation-dbs/-/raw/main/ip2location-city/ipv6.tsv?inline=false"
+  geolite2:
+    format: hex_tsv
+    lat_col: 6
+    long_col: 7
+    ipv4: "https://gitlab.com/tdulcet/ip-geolocation-dbs/-/raw/main/geolite2-city/ipv4-en.tsv?inline=false"
+    ipv6: "https://gitlab.com/tdulcet/ip-geolocation-dbs/-/raw/main/geolite2-city/ipv6-en.tsv?inline=false"
+  dbip:
+    format: hex_tsv
+    lat_col: 5
+    long_col: 6
+    ipv4: "https://gitlab.com/tdulcet/ip-geolocation-dbs/-/raw/main/dbip-city/ipv4.tsv?inline=false"
+    ipv6: "https://gitlab.com/tdulcet/ip-geolocation-dbs/-/raw/main/dbip-city/ipv6.tsv?inline=false"
+
+country:
+  geo-whois-asn-country:
+    format: hex_tsv
+    ipv4: "https://gitlab.com/tdulcet/ip-geolocation-dbs/-/raw/main/geo-whois-asn-country/ipv4.tsv?inline=false"
+    ipv6: "https://gitlab.com/tdulcet/ip-geolocation-dbs/-/raw/main/geo-whois-asn-country/ipv6.tsv?inline=false"
+  ipinfo-country:
+    format: hex_tsv
+    ipv4: "https://gitlab.com/tdulcet/ip-geolocation-dbs/-/raw/main/ipinfo-country/ipv4.tsv?inline=false"
+    ipv6: "https://gitlab.com/tdulcet/ip-geolocation-dbs/-/raw/main/ipinfo-country/ipv6.tsv?inline=false"
+  iplocate-country:
+    format: decimal_csv
+    ipv4: "https://raw.githubusercontent.com/sapics/ip-location-db/refs/heads/main/iplocate-country/iplocate-country-ipv4.csv"
+    ipv6: "https://raw.githubusercontent.com/sapics/ip-location-db/refs/heads/main/iplocate-country/iplocate-country-ipv6.csv"

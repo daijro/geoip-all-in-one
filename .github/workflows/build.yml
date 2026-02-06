@@ -1,0 +1,72 @@
+name: Build GeoIP Database
+
+on:
+  schedule:
+    - cron: '0 3 * * 3'  # every wednesday 3am utc
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pyyaml mmdb_writer netaddr tzfpy requests
+
+      - name: Build
+        run: make
+
+      - name: Prepare release files
+        run: |
+          cp geoip_ipv4.mmdb geoip-aio-ipv4.mmdb
+          cp geoip_ipv6.mmdb geoip-aio-ipv6.mmdb
+          cp geoip.mmdb geoip-aio-all.mmdb
+
+      - name: Get release tag
+        id: tag
+        run: |
+          # use the most recent wednesday as the tag
+          # manual runs between wednesdays will overwrite the same release
+          days_since_wed=$(( ($(date +%u) - 3 + 7) % 7 ))
+          tag=$(date -d "$days_since_wed days ago" +"%Y.%m.%d")
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Delete existing release
+        run: gh release delete "${{ steps.tag.outputs.tag }}" --cleanup-tag -y || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: ${{ steps.tag.outputs.tag }}
+          files: |
+            geoip-aio-ipv4.mmdb
+            geoip-aio-ipv6.mmdb
+            geoip-aio-all.mmdb
+
+      - name: Remove old releases
+        uses: dev-drprasad/delete-older-releases@master
+        with:
+          keep_latest: 2
+          delete_tags: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Delete old workflow runs
+        uses: Mattraks/delete-workflow-runs@main
+        with:
+          retain_days: 0
+          keep_minimum_runs: 2
