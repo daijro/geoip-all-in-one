@@ -21,6 +21,13 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Create swap space
+        run: |
+          sudo fallocate -l 16G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+
       - name: Install dependencies
         run: pip install pyyaml mmdb_writer netaddr tzfpy requests
 
