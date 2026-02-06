@@ -1,26 +1,3 @@
-merge:
-  # if all 3 coord sources say the same country, try and find the center source
-  # unless they are lower than this long/lat degree threshold
-  coord_spread_threshold: 2
-  coord_priority:
-    - ip2location
-    - dbip
-    - geolite2
-
-  # country voting tiebreak order
-  vote_priority:
-    - ip2location
-    - geo-whois-asn-country
-    - dbip
-    - geolite2
-    - ipinfo-country
-    - iplocate-country
-
-  # source pairs that force a country win before voting (pretty accurate combo)
-  overrides:
-    - match: [ip2location, geo-whois-asn-country]
-
-
 latlong:
   ip2location:
     format: hex_tsv

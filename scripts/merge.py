@@ -337,7 +337,12 @@ def main() -> None:
     with open(sources_file) as f:
         sources = yaml.safe_load(f)
 
-    merge_config = sources.get('merge', {})
+    rules_file = os.path.join(os.path.dirname(sources_file), 'rules.yml')
+    if os.path.exists(rules_file):
+        with open(rules_file) as f:
+            merge_config = yaml.safe_load(f) or {}
+    else:
+        merge_config = {}
 
     # load latlong sources (return (country, lat, lon) tuples)
     print(f"Loading {ip_version} lat/long sources...", file=sys.stderr)
