@@ -15,7 +15,7 @@ IPV6_DIR := $(DATA_DIR)/ipv6
 IPV4_DONE := $(IPV4_DIR)/.downloaded
 IPV6_DONE := $(IPV6_DIR)/.downloaded
 
-all: $(COMBINED_MMDB)
+all: $(COMBINED_MMDB) $(IPV4_MMDB) $(IPV6_MMDB)
 
 download: download-ipv4 download-ipv6
 download-ipv4: $(IPV4_DONE)
@@ -41,10 +41,10 @@ $(IPV6_MERGED): $(IPV6_DONE) scripts/merge.py
 
 convert: $(COMBINED_MMDB)
 
-$(IPV4_MMDB): $(IPV4_MERGED)
+$(IPV4_MMDB): $(IPV4_MERGED) scripts/convert.py
 	$(PYTHON) scripts/convert.py $< $@ 4
 
-$(IPV6_MMDB): $(IPV6_MERGED)
+$(IPV6_MMDB): $(IPV6_MERGED) scripts/convert.py
 	$(PYTHON) scripts/convert.py $< $@ 6
 
 $(COMBINED_MMDB): $(IPV4_MERGED) $(IPV6_MERGED) scripts/convert.py

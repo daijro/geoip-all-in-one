@@ -39,6 +39,9 @@ def process_file(input_file, writer, ipv6=False):
                 start_ip = hex_to_ip(start_hex, ipv6)
                 end_ip = hex_to_ip(end_hex, ipv6)
 
+                ip_range = netaddr.IPRange(start_ip, end_ip)
+                ip_set = netaddr.IPSet(ip_range)
+
                 lat = float(latitude)
                 lon = float(longitude)
                 tz = get_tz(lon, lat)
@@ -48,8 +51,7 @@ def process_file(input_file, writer, ipv6=False):
                     'location': {'latitude': lat, 'longitude': lon, 'time_zone': tz},
                 }
 
-                for cidr in netaddr.iprange_to_cidrs(start_ip, end_ip):
-                    writer.insert_network(cidr, data)
+                writer.insert_network(ip_set, data)
                 count += 1
 
             except Exception as e:
