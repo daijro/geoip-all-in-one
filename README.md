@@ -2,7 +2,11 @@
 
 This downloads the following sources, merges them with a voting algorithm, and outputs a single mmdb file with country, coordinates, and timezone info.
 
-#### City sources:
+Releases are built weekly.
+
+---
+
+### City sources
 
 Longitude and latitude:
 
@@ -10,7 +14,7 @@ Longitude and latitude:
 - [GeoLite2](https://www.maxmind.com)
 - [DB-IP Lite](https://db-ip.com)
 
-#### Country sources:
+### Country sources
 
 These are additionally used to help vote on which city source to use for a given IP range:
 
@@ -18,15 +22,13 @@ These are additionally used to help vote on which city source to use for a given
 - [IPinfo\.io](https://ipinfo.io)
 - [IPlocate](https://iplocate.io)
 
-#### Timezone data
+### Timezone data
 
 Calculated from the longitude/latitude using [tzfpy](https://github.com/ringsaturn/tzfpy)
 
 ---
 
-### How it works
-
-#### Merge algorithm
+## Merge algorithm
 
 For each IP range, all 6 sources vote on a country.
 
@@ -42,7 +44,7 @@ This was developed for Camoufox's geolocation finder, so I've left out city name
 
 ---
 
-### Licenses
+## Licenses
 
 | Source           | Attribution                                                                                         |
 | ---------------- | --------------------------------------------------------------------------------------------------- |
@@ -50,8 +52,7 @@ This was developed for Camoufox's geolocation finder, so I've left out city name
 | GeoLite2         | This product includes GeoLite2 Data created by MaxMind, available from https://www.maxmind.com/.    |
 | DB-IP Lite       | [IP Geolocation by DB-IP](https://db-ip.com)                                                        |
 
-
-### Sources
+## Sources
 
 - [tdulcet/ip-geolocation-dbs](https://github.com/tdulcet/ip-geolocation-dbs)
 - [sapics/ip-location-db](https://github.com/sapics/ip-location-db)

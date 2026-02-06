@@ -1,4 +1,4 @@
-name: Build GeoIP Database
+name: Build
 
 on:
   schedule:
