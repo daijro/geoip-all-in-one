@@ -36,12 +36,6 @@ jobs:
       - name: Build all
         run: make all
 
-      - name: Build ipv4
-        run: make ipv4
-
-      - name: Build ipv6
-        run: make ipv6
-
       - name: Prepare release files
         run: |
           cp geoip_ipv4.mmdb geoip-aio-ipv4.mmdb
