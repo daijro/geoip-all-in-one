@@ -21,8 +21,9 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Create swap space
+      - name: Expand swap space
         run: |
+          sudo swapoff /swapfile
           sudo fallocate -l 16G /swapfile
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
