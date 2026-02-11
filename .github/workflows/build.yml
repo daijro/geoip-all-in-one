@@ -24,7 +24,7 @@ jobs:
 
       - name: Expand swap space
         run: |
-          sudo swapoff /swapfile
+          sudo swapoff /swapfile || true
           sudo fallocate -l 16G /swapfile
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
