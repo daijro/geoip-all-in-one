@@ -171,6 +171,39 @@ def load_country_csv(filename: str, ipv6: bool = False) -> RangeTable:
     return table
 
 
+def load_country_cidr_csv(filename: str, ipv6: bool = False) -> RangeTable:
+    """
+    handles a combined ipv4+ipv6 cidr csv with a header row.
+    columns: network(cidr), continent_code, country_code, country_name
+    """
+    import ipaddress
+
+    table = RangeTable()
+    if not os.path.exists(filename):
+        return table
+    with open(filename) as f:
+        for line in f:
+            parts = line.strip().split(',')
+            if len(parts) < 3:
+                continue
+            net_str = parts[0]
+            if net_str == 'network':  # header row
+                continue
+            # combined file: skip rows that aren't the version we're building
+            if (':' in net_str) != ipv6:
+                continue
+            try:
+                net = ipaddress.ip_network(net_str, strict=False)
+                start = int(net.network_address)
+                end = int(net.broadcast_address) + 1
+                table.add(start, end, parts[2])
+            except Exception as e:
+                print(f"Error processing line in {filename}: {e}", file=sys.stderr)
+                pass
+    table.finalize(os.path.basename(filename))
+    return table
+
+
 """
 merge logic
 """
@@ -348,7 +381,7 @@ def main() -> None:
     print(f"Loading {ip_version} lat/long sources...", file=sys.stderr)
     latlong_sources: dict[str, RangeTable] = {}
     for name, info in sources.get('latlong', {}).items():
-        ext = 'csv' if info.get('format') == 'decimal_csv' else 'tsv'
+        ext = 'csv' if (info.get('format') or '').endswith('csv') else 'tsv'
         filepath = os.path.join(data_dir, f"{name}.{ext}")
         lat_col = info.get('lat_col', 5)
         long_col = info.get('long_col', 6)
@@ -360,9 +393,11 @@ def main() -> None:
     country_sources: dict[str, RangeTable] = {}
     for name, info in sources.get('country', {}).items():
         fmt = info.get('format', 'hex_tsv')
-        ext = 'csv' if fmt == 'decimal_csv' else 'tsv'
+        ext = 'csv' if fmt.endswith('csv') else 'tsv'
         filepath = os.path.join(data_dir, f"{name}.{ext}")
-        if fmt == 'decimal_csv':
+        if fmt == 'cidr_csv':
+            country_sources[name] = load_country_cidr_csv(filepath, ipv6)
+        elif fmt == 'decimal_csv':
             country_sources[name] = load_country_csv(filepath, ipv6)
         else:
             country_sources[name] = load_country_tsv(filepath)

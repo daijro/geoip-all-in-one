@@ -28,6 +28,7 @@ country:
     ipv4: "https://gitlab.com/tdulcet/ip-geolocation-dbs/-/raw/main/ipinfo-country/ipv4.tsv?inline=false"
     ipv6: "https://gitlab.com/tdulcet/ip-geolocation-dbs/-/raw/main/ipinfo-country/ipv6.tsv?inline=false"
   iplocate-country:
-    format: decimal_csv
-    ipv4: "https://raw.githubusercontent.com/sapics/ip-location-db/refs/heads/main/iplocate-country/iplocate-country-ipv4.csv"
-    ipv6: "https://raw.githubusercontent.com/sapics/ip-location-db/refs/heads/main/iplocate-country/iplocate-country-ipv6.csv"
+    # single combined (ipv4+ipv6) CIDR csv
+    format: cidr_csv
+    ipv4: "https://media.githubusercontent.com/media/iplocate/ip-address-databases/refs/heads/main/ip-to-country/ip-to-country.csv.zip"
+    ipv6: "https://media.githubusercontent.com/media/iplocate/ip-address-databases/refs/heads/main/ip-to-country/ip-to-country.csv.zip"
