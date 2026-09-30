@@ -6,6 +6,13 @@ coord_priority:
   - dbip
   - geolite2
 
+# when only two coord sources have a city-level point and they are further apart
+# than coord_spread_threshold there is no center to pick, so this order decides
+coord_tiebreak:
+  - dbip
+  - ip2location
+  - geolite2
+
 # country voting tiebreak order
 vote_priority:
   - ip2location

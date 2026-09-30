@@ -103,7 +103,7 @@ class RangeTable:
 
 """
 file loaders
-latlong loaders return (country, lat, lon) tuples, country loaders return country strings
+latlong loaders return (country, lat, lon, located) tuples, country loaders return country strings
 """
 
 
@@ -118,7 +118,10 @@ def load_latlong_tsv(filename: str, lat_col: int, long_col: int, ipv6: bool = Fa
                 try:
                     start = hex_to_int(parts[0])
                     end = hex_to_int(parts[1]) + 1
-                    table.add(start, end, (parts[2], parts[lat_col], parts[long_col]))
+                    # the columns between country and lat are place names (region/city).
+                    # all empty means a country-level fallback point, not a location
+                    located = any(p not in ('', '-') for p in parts[3:lat_col])
+                    table.add(start, end, (parts[2], parts[lat_col], parts[long_col], located))
                 except Exception as e:
                     print(f"Error processing line in {filename}: {e}", file=sys.stderr)
                     pass
@@ -215,13 +218,20 @@ def distance(lat1, lon1, lat2, lon2) -> float:
 
 
 def pick_center_coords(
-    named_ll: list[tuple[str, tuple]], threshold: int = 2
+    named_ll: list[tuple[str, tuple]], threshold: int = 2, tiebreak: Optional[list[str]] = None
 ) -> tuple[str, str, str]:
     """
     when all coord sources agree on country, pick the point closest to the others.
     if spread is small (< threshold degrees), just use highest-priority source instead.
-    named_ll: [(name, (country, lat, lon))] in coord priority order.
+    two sources further apart than that have no center, so tiebreak order decides.
+    named_ll: [(name, (country, lat, lon, located))] in coord priority order.
     """
+    if len(named_ll) == 2 and tiebreak:
+        (_, a), (_, b) = named_ll
+        if distance(a[1], a[2], b[1], b[2]) > threshold:
+            rank = {name: i for i, name in enumerate(tiebreak)}
+            named_ll = sorted(named_ll, key=lambda n: rank.get(n[0], len(rank)))
+
     if len(named_ll) < 3:
         name, data = named_ll[0]
         return (data[1], data[2], name)
@@ -285,6 +295,9 @@ def pick_winner(
         data = all_data.get(name)
         if data and isinstance(data, tuple):
             coord_sources.append((data[0], data[1], data[2], name))
+    # located coords first, country-level fallback points only when nothing else matches
+    located = {name for name, data in all_data.items() if isinstance(data, tuple) and data[3]}
+    coord_sources.sort(key=lambda s: s[3] not in located)
 
     # find best coords for a country by walking coord priority
     def find_coords(country: str) -> Optional[tuple[str, str, str]]:
@@ -304,7 +317,10 @@ def pick_winner(
     ll_country_list = [data[0] for _, data in available_ll]
 
     if len(available_ll) >= 2 and len(set(ll_country_list)) == 1:
-        lat, lon, src = pick_center_coords(available_ll, threshold)
+        # a country-level point sits between real locations and would win the center pick
+        located_ll = [(name, data) for name, data in available_ll if name in located]
+        tiebreak = merge_config.get('coord_tiebreak')
+        lat, lon, src = pick_center_coords(located_ll or available_ll, threshold, tiebreak)
         return (ll_country_list[0], lat, lon, f'unanimous->{src}')
 
     # rules that override the country vote if they match
